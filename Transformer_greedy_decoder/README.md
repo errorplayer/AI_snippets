@@ -1,6 +1,7 @@
 ### Features  
 + supports chinese corpus training (data preprocess methods prepared)
 + supports raw natural chinese sentence test immediately (rough pretrained model & preprocessed corpus dicts pickle files available for a quick taste)
+> ![sentence immediate test](https://github.com/errorplayer/AI_snippets/blob/master/Transformer_greedy_decoder/pic/display_sentence_test.JPG)  
 + supports importation of  your new parallel corpus data (easily adjust some parameters to preprocess your own corpus data)  
 > we prefer the corpus data with each line following the format below in a *.txt* file:  
 > english sentence **\t** chinese sentence  
