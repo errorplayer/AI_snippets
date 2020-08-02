@@ -13,4 +13,4 @@
 1. Pointer -- 复制词：从输入文本中找词拿过来，这样做可以提高准确性，特别是能够避免OOV。  
 2. Generator -- 生成词：从它的extended vocabulary里选一个词。extended vocabulary 就是[训练语料的词 + 所有输入文本的词]。尽量避免了它“无词可用”的尴尬。   
 3. Coverage machanism -- 记录 $t$ 时刻前的attention累和，用作Loss计算依据，控制模型生成时对输入文本的内容覆盖。  
-4. Pointer和Generator在实现过程中是借助一个联动开关变量 $P_gen$ 来切换的。
+4. Pointer和Generator在实现过程中是借助一个联动开关变量 $P_{gen}$ 来切换的。
