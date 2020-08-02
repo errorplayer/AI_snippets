@@ -16,7 +16,7 @@
 4. Pointer和Generator在实现过程中是借助一个联动开关变量 $P_{gen}$ 来切换的。
 
 
-+ 1 baseline model  
+### 1 baseline model  
 也就是seq2seq2 with attention 模型。  
 按次序把每一个输入文本token输进去，都会产生一个对应当前时刻及过去时刻的隐藏状态$h_i$，把最后一个token输入进去以后，产生的代表整个输入文本的隐藏状态$h_t$可以直接当作encoder对整个输入文本的一个编码表示，也可以经过某些变换，假设变换后把它记为$s_t$。    
 接下来就是attention score的计算。这个score的计算方式可以有很多种，文中提到的是  
@@ -25,6 +25,7 @@ $$e_i^t=v*tanh(W_h h_i+W_s s_t+b_{attn})\tag{1}\label{1}$$
 > 1.下标i 代表第几个encoder的输入token，范围是输入token个数，也就是输入文本长度。 $h_i$是固定的，因为每放入一个输入token就会产生一个对应位置的 $h_i$。  
 > 2. $s_t$并非不变的，它是decoder每接收一个decoder的输入token产生的对应位置的$s_t$, 其实写成$s_j$更好解释，$j$表示第几个decoder的输入token，decoder 没有输出 \<EOS\> 前，我们是不知道$j$最大能有多大的。比如现在给decoder输入第2个token，我们需要decoder预测第三个token，那么就需要带入$s_2$去公式$\ref{1}$算新的向量$e_t$， 记住$h_i$是固定的。   
 > 3. 这里的$e_i$是标量，代表decoder输入第$j$个token预测第$j+1$个token时，对第$i$个encoder输入token的注意值。$e^t=(e_0, e_1, ..., e_N)$ 是一个向量，是decoder在做预测第$j+1$个token时对整个encoder输入序列的回顾。  
-计算完attention score，就用一个$softmax$将其转成attention weights。  
+
+计算完attention score，就用一个$softmax$将其转成attention weights。      
 $$a^t=softmax(e^t)$$  
 
