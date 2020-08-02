@@ -32,6 +32,10 @@ $$a^t=softmax(e^t)\tag{2}$$
 $$h_t^\*=\sum_i a_i^t h_i\tag{3}\label{3}$$  
 公式$\ref{3}$算出来的上下文向量可以当作是decoder在当前这一timestep对整个输入序列的回顾，接下来把它和decoder前一时刻的隐藏状态拼接，再经过两个线性层即可得到预测词的概率分布$P_{vocab}$    
 $$P_{vocab}=softmax(V_2(V_1(s_j,h_t^\*)+b_1)+b_2)\tag{4}\label{4}$$  
+训练的话，用的是NLL(negative log likelihood)。  
+$$loss_t = -logP_{vocab}(w_t)\tag{5}$$   
+$$loss=\frac {1}{T}\sum_{t=0}^{T}loss_t\tag{6}$$  
+其中T为输出序列长度。
 
 
 
