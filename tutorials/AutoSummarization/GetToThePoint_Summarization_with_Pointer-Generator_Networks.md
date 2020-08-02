@@ -29,7 +29,7 @@ $$e_i^t=v*tanh(W_h h_i+W_s s_t+b_{attn})\tag{1}\label{1}$$
 计算完attention score，就用一个$softmax$将其转成attention weights。      
 $$a^t=softmax(e^t)\tag{2}$$  
 用attention weights去weight sum$h_i$, 得到上下文向量$h_t^\*$。  
-$$h_t^\*=\sum_i a_i^t h_i\tag{3}$$  
+$$h_t^\*=\sum_i a_i^t h_i\tag{3}\label{3}$$  
 公式$\ref{3}$算出来的上下文向量可以当作是decoder在当前这一timestep对整个输入序列的回顾，接下来把它和decoder前一时刻的隐藏状态拼接，再经过两个线性层即可得到预测词的概率分布$P_{vocab}$    
 $$P_{vocab}=softmax(V_2(V_1(s_j,h_t^\*)+b_1)+b_2)\tag{4}\label{4}$$  
 
