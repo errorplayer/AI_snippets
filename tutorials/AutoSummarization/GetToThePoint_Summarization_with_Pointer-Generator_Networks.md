@@ -24,8 +24,14 @@ $$e_i^t=v*tanh(W_h h_i+W_s s_t+b_{attn})\tag{1}\label{1}$$
 > 这里注意的地方：  
 > 1.下标i 代表第几个encoder的输入token，范围是输入token个数，也就是输入文本长度。 $h_i$是固定的，因为每放入一个输入token就会产生一个对应位置的 $h_i$。  
 > 2. $s_t$并非不变的，它是decoder每接收一个decoder的输入token产生的对应位置的$s_t$, 其实写成$s_j$更好解释，$j$表示第几个decoder的输入token，decoder 没有输出 \<EOS\> 前，我们是不知道$j$最大能有多大的。比如现在给decoder输入第2个token，我们需要decoder预测第三个token，那么就需要带入$s_2$去公式$\ref{1}$算新的向量$e_t$， 记住$h_i$是固定的。   
-> 3. 这里的$e_i$是标量，代表decoder输入第$j$个token预测第$j+1$个token时，对第$i$个encoder输入token的注意值。$e^t=(e_0, e_1, ..., e_N)$ 是一个向量，是decoder在做预测第$j+1$个token时对整个encoder输入序列的回顾。  
+> 3. 这里的$e_i$是标量，代表decoder输入第$j$个token预测第$j+1$个token时，对第$i$个encoder输入token的注意值。$e^t=(e_0, e_1, ..., e_N)$ 是一个向量，是decoder在做预测第$j+1$个token时对整个encoder输入序列的全局预览。  
 
 计算完attention score，就用一个$softmax$将其转成attention weights。      
-$$a^t=softmax(e^t)$$  
+$$a^t=softmax(e^t)\tag{2}$$  
+用attention weights去weight sum$h_i$, 得到上下文向量$h_t^\*$。  
+$$h_t^\*=\sum_i a_i^t h_i\tag{3}$$  
+公式$\ref{3}$算出来的上下文向量可以当作是decoder在当前这一timestep对整个输入序列的回顾，接下来把它和decoder前一时刻的隐藏状态拼接，再经过两个线性层即可得到预测词的概率分布$P_{vocab}$    
+$$P_{vocab}=softmax(V_2(V_1(s_j,h_t^\*)+b_1)+b_2)\tag{4}\label{4}$$  
+
+
 
