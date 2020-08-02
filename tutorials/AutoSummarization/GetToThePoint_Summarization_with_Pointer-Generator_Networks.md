@@ -23,7 +23,7 @@
 $$e_i^t=v*tanh(W_h h_i+W_s s_t+b_{attn})\tag{1}\label{1}$$  
 这里注意的地方：  
 1. 下标i 代表第几个encoder的输入token，范围是输入token个数，也就是输入文本长度。 $h_i$是固定的，因为每放入一个输入token就会产生一个对应位置的 $h_i$。
-2.  $s_t$并非不变的，它是decoder每接收一个decoder的输入token产生的对应位置的$s_t$, 其实写成$s_j$更好解释，$j$表示第几个decoder的输入token，decoder 没有输出 \<EOS\> 前，我们是不知道$j$最大能有多大的。比如现在给decoder输入第2个token，我们需要decoder预测第三个token，那么就需要带入$s_2$去公式$\label{1}$算新的向量$e_t$， 记住$h_i$是固定的。
+2.  $s_t$并非不变的，它是decoder每接收一个decoder的输入token产生的对应位置的$s_t$, 其实写成$s_j$更好解释，$j$表示第几个decoder的输入token，decoder 没有输出 \<EOS\> 前，我们是不知道$j$最大能有多大的。比如现在给decoder输入第2个token，我们需要decoder预测第三个token，那么就需要带入$s_2$去公式$\ref{1}$算新的向量$e_t$， 记住$h_i$是固定的。
 3. 
 计算完attention score，就用一个$softmax$将其转成attention weights。  
 $$a^t=softmax(e^t)$$  
