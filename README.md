@@ -1,2 +1,2 @@
 # AI_snippets
-Store some useful, meaningful and instructional code blocks
+一些有关中文自然语言处理的Pytorch模型代码整合记录，以及个人笔记。正在维护，不定期更新。 谢谢
