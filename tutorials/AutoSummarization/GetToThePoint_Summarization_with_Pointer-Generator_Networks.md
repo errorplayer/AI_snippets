@@ -57,13 +57,14 @@ $$P(w)=p_{gen}P_{vocab}(w)+(1-p_{gen})\sum_{i:w_i = w}a_i^j\tag{8}\label{8}$$
 这样一来，预测下一个词的概率分布$p(w)$的w着眼于上文提到的 *extended vocabulary* ，训练Loss还是公式$\ref{5}$和公式$\ref{6}$，可以通过引导开关变量，进而让模型学会什么时候需要从输入文本复制词，这样可以避免OOV。
 
 ### 3 Coverage mechanism   
-重复输入相同内容的问题一直是生成式模型绕不开的话题。本文作者的想法是：维护一个coverage vector($c^j$)，它是之前所有timestep的attention weight累计。这个coverage vector把输入文本的内容和该向量的每一个元素一一对应，这个向量的长度切好就是输入文本token的长度。因为从直觉上，某一槽位的累计值越高，说明它已经越有可能被输出了，而那些低值的槽位，则很有可能还没有被输出。可参考<a name="autosummarization-pointer-generator-network-pic1">下图</a>。  
-![explain_coverage_slot](https://github.com/errorplayer/AI_snippets/blob/master/pics/autosummarization-pointer-generator-network-pic1.png)   
+重复输入相同内容的问题一直是生成式模型绕不开的话题。本文作者的想法是：维护一个coverage vector($c^j$)，它是之前所有timestep的attention weight累计。这个coverage vector把输入文本的内容和该向量的每一个元素一一对应，这个向量的长度切好就是输入文本token的长度。因为从直觉上，某一槽位的累计值越高，说明它已经越有可能被输出了，而那些低值的槽位，则很有可能还没有被输出。可参考下图。  
+
+<img src="https://github.com/errorplayer/AI_snippets/blob/master/pics/autosummarization-pointer-generator-network-pic1.png" width="50%">   
 
 其计算公式如下：  
 $$c^j=\sum_{t=0}^j a^t \tag{9}\label{9}$$  
 > 在原文中，$\sum$号的上标是要减一的，这里没有减是因为，本文描述问题。只要知道是记录过去时刻的attention weight就可以了。  
 
-<a name="autosummarization-pointer-generator-network-pic1">这里</a>
+
 
 
