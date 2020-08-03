@@ -16,6 +16,9 @@
 4. Pointer和Generator在实现过程中是借助一个联动开关变量 $P_{gen}$ 来切换的。
 
 
+`约定1: 下标i代表encoder输入token序号，下标j代表decoder输入token的序号。`  
+`约定2: encoder输入文本长度是已知的，假设其长度为N；但decoder的预测长度未知。`  
+
 ### 1 baseline model  
 也就是seq2seq2 with attention 模型。  
 按次序把每一个输入文本token输进去，都会产生一个对应当前时刻及过去时刻的隐藏状态$h_i$，把最后一个token输入进去以后，产生的代表整个输入文本的隐藏状态$h_t$可以直接当作encoder对整个输入文本的一个编码表示，也可以经过某些变换，假设变换后把它记为$s_t$。    
