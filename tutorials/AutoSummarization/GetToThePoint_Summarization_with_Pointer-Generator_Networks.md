@@ -13,7 +13,7 @@
 1. Pointer -- 复制词：从输入文本中找词拿过来，这样做可以提高准确性，特别是能够避免OOV。  
 2. Generator -- 生成词：从它的extended vocabulary里选一个词。  
 3. Coverage machanism -- 记录 $t$ 时刻前的attention累和，用作Loss计算依据，控制模型生成时对输入文本的内容覆盖。  
-4. Pointer和Generator在实现过程中是借助一个联动开关变量 $P_{gen}$ 来切换的, 最终产生词所使用的词库是$extended+vocabulary \label{extvocab}$， 也就是[训练词库 + 当前输入文本的词]。尽量避免了它“无词可用”的尴尬。   
+4. Pointer和Generator在实现过程中是借助一个联动开关变量 $P_{gen}$ 来切换的, 最终产生词所使用的词库是$extended \+ vocabulary \label{999}$， 也就是[训练词库 + 当前输入文本的词]。尽量避免了它“无词可用”的尴尬。   
 
 
 
@@ -52,6 +52,6 @@ $$P(w)=p_{gen}P_{vocab}(w)+(1-p_{gen})\sum_{i:w_i = w}a_i^j\tag{8}\label{8}$$
 若$w\notin$输入文本，$\sum_{i:w_i = w}a_i^j$。  
 > 笔者觉得：这里的$\sum_{i:w_i = w}a_i^j$是在第j次预测时，相同的encoder输入token($w_i$)的attention weight求和。比如输入文本为`我是东南大学的学生，东南大学是一所教学质量过硬的高校。`，这里假设令$w_i$为`东南大学`时，因为该token出现了两次，所以要把两个位置的attentiono weight相加。  
 
-这样一来，预测下一个词的概率分布$p(w)$的w着眼于上文提到的$extended+vocabulary \ref{extvocab}$。可以避免OOV。
+这样一来，预测下一个词的概率分布$p(w)$的w着眼于上文提到的$extended \+ vocabulary \ref{999}$。可以避免OOV。
 
 
