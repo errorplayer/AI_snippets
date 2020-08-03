@@ -11,9 +11,10 @@
 
 ### 文中给出的解决思路  
 1. Pointer -- 复制词：从输入文本中找词拿过来，这样做可以提高准确性，特别是能够避免OOV。  
-2. Generator -- 生成词：从它的extended vocabulary里选一个词。extended vocabulary 就是[训练语料的词 + 所有输入文本的词]。尽量避免了它“无词可用”的尴尬。   
+2. Generator -- 生成词：从它的extended vocabulary里选一个词。  
 3. Coverage machanism -- 记录 $t$ 时刻前的attention累和，用作Loss计算依据，控制模型生成时对输入文本的内容覆盖。  
-4. Pointer和Generator在实现过程中是借助一个联动开关变量 $P_{gen}$ 来切换的。
+4. Pointer和Generator在实现过程中是借助一个联动开关变量 $P_{gen}$ 来切换的, 最终产生词所使用的词库是$extended_vocabulary \label{extvocab}$， 也就是[训练词库 + 当前输入文本的词]。尽量避免了它“无词可用”的尴尬。   
+
 
 
 `约定1: 下标i代表encoder输入token序号，下标j代表decoder输入token的序号。`  
@@ -38,8 +39,19 @@ $$h_j^\*=\sum_i a_i^j h_i\tag{3}\label{3}$$
 $$P_{vocab}=softmax(V_2(V_1(s_j,h_j^\*)+b_1)+b_2)\tag{4}\label{4}$$  
 训练的话，用的是NLL(negative log likelihood)。  
 $$loss_j = -logP_{vocab}(w_j)\tag{5}$$   
-$$loss=\frac {1}{T}\sum_{t=0}^{T}loss_t\tag{6}$$  
+$$loss=\frac {1}{T}\sum_{j=0}^{T}loss_j\tag{6}$$  
 其中T为最终输出序列长度。
 
+
+### 2 Pointer-Generator Network  
+作者介绍文中的pointer-generator network是baseline和[pointer network](https://arxiv.org/abs/1506.03134)的一个融合。在每次预测时先计算一个开关变量$p_{gen}$，入参分别有当前根据公式$\ref{3}$计算的上下文向量$h_j^\*$，前一时刻传过来的decoder隐藏状态$s_j$，当前时刻decoder输入token$x_j$。  
+$$p_{gen}=\sigma(w_{h^\*}h_j^\*+w_s s_j+w_x x_j + b_{ptr})\tag{7}\label{7}$$   
+于是产生的词概率分布计算公式$\ref{8}$为：  
+$$P(w)=p_{gen}P_{vocab}(w)+(1-p_{gen})\sum_{i:w_i = w}a_i^j\tag{8}\label{8}$$  
+若$w\notin$训练词库，$p_{vocab}$自然为0；  
+若$w\notin$输入文本，$\sum_{i:w_i = w}a_i^j$。  
+> 笔者觉得：这里的$\sum_{i:w_i = w}a_i^j$是在第j次预测时，相同的encoder输入token($w_i$)的attention weight求和。比如输入文本为`我是东南大学的学生，东南大学是一所教学质量过硬的高校。`，这里假设令$w_i$为`东南大学`时，因为该token出现了两次，所以要把两个位置的attentiono weight相加。  
+
+这样一来，预测下一个词的概率分布$p(w)$的w着眼于上文提到的$extended_vocabulary \ref{extvocab}$。可以避免OOV。
 
 
