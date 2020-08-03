@@ -59,12 +59,21 @@ $$P(w)=p_{gen}P_{vocab}(w)+(1-p_{gen})\sum_{i:w_i = w}a_i^j\tag{8}\label{8}$$
 ### 3 Coverage mechanism   
 重复输入相同内容的问题一直是生成式模型绕不开的话题。本文作者的想法是：维护一个coverage vector($c^j$)，它是之前所有timestep的attention weight累计。这个coverage vector把输入文本的内容和该向量的每一个元素一一对应，这个向量的长度切好就是输入文本token的长度。因为从直觉上，某一槽位的累计值越高，说明它已经越有可能被输出了，而那些低值的槽位，则很有可能还没有被输出。可参考下图。  
 
-<img src="https://github.com/errorplayer/AI_snippets/blob/master/pics/autosummarization-pointer-generator-network-pic1.png" width="50%">   
+<img src="https://github.com/errorplayer/AI_snippets/blob/master/pics/autosummarization-pointer-generator-network-pic1.png" width="50%" align="center">   
 
 其计算公式如下：  
 $$c^j=\sum_{t=0}^j a^t \tag{9}\label{9}$$  
 > 在原文中，$\sum$号的上标是要减一的，这里没有减是因为，本文描述问题。只要知道是记录过去时刻的attention weight就可以了。  
 
+把覆盖向量融入attention score的计算，将公式$\ref{1}$升级为公式$\ref{10}$：  
+$$e_i^j=V*tanh(W_h h_i+W_s s_j+W_c c_i^jb_{attn})\tag{10}\label{10}$$   
 
+然后还需要特别设计一个Loss，这个loss的设计可谓匠心独具。先看公式$ref{11}$：  
+$$covloss_j=\sum_i min(a_i^j, c_i^j)\tag{11}\label{11}$$  
+
+首先它是有界的，因为$covloss_j\le \sum_i a_i^j=1$。如何理解这个loss的设计呢？   
+1. 如果某个槽位的累计值很高，那么说明decoder之前已经很关注这个槽位了，那它很有可能已经被输出过，这个公式是两个找最小，所以希望选到$a_i^j$而不是$c_i^j$，那么如果当前的attention weight在这个槽位上比较大，说明decoder又来注意这个槽位的内容了，这个时候可能会重复输出，因此loss的值随着$a_i^j$的值增大而增大；反之，如果$a_i^j$很小，说明模型已经不怎么注意它了，这也符合不重复输出的目的，因而loss的值会小。  
+2. 如果某个槽位的累计值很小，那么说明decoder之前没有怎么关注这个槽位，我们希望它的值比$a_i^j$越小越好。然后loss来选它($c_i^j$)。$a_i^j$的值在这种情况下应该越大越好，$c_i^j$在这种情况下应该越小越好。  
+3. 从最理想的情况下，我们希望每次attention weight($a^j)只有一个槽位是1，其他都是0，然后这样累加起来零重叠，但是会有很多槽位是0(因为这个任务是summarization,肯定不能全盘照顾到)。但是这种情况不会出现，所以作者设计的这个loss其实很精妙。看似表面每次只是简单的选取最小的那个作为loss就完事儿，但是仔细结合公式$\ref{9}$，就会发现，因为$c_i^j$是会累加$a_i^j$的，这样会暗中帮助模型在学习的时候注意让$a_i^j$,  $c_i^j$这两个量一个非常小一个尽量大。
 
 
