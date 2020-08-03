@@ -82,4 +82,6 @@ $$loss_j = -logP_{vocab}(w_j)+\lambda \sum_i min(a_i^j, c_i^j)\tag{12}\label{12}
 
 #### 谢谢查看！ 如有错漏，欢迎提issue。 
 
+#### [Get To The Point: Summarization with Pointer-Generator Networks](https://arxiv.org/abs/1704.04368)
+
 
