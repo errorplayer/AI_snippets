@@ -38,20 +38,20 @@ $$h_j^\*=\sum_i a_i^j h_i\tag{3}\label{3}$$
 公式$\ref{3}$算出来的上下文向量可以当作是decoder在当前这一timestep对整个输入序列的回顾，接下来把它和decoder前一时刻的隐藏状态拼接，再经过两个线性层即可得到预测词的概率分布$P_{vocab}$    
 $$P_{vocab}=softmax(V_2(V_1(s_j,h_j^\*)+b_1)+b_2)\tag{4}\label{4}$$  
 训练的话，用的是NLL(negative log likelihood)。  
-$$loss_j = -logP_{vocab}(w_j)\tag{5}$$   
-$$loss=\frac {1}{T}\sum_{j=0}^{T}loss_j\tag{6}$$  
+$$loss_j = -logP_{vocab}(w_j)\tag{5}\label{5}$$   
+$$loss=\frac {1}{T}\sum_{j=0}^{T}loss_j\tag{6}\label{6}$$  
 其中T为最终输出序列长度。
 
 
 ### 2 Pointer-Generator Network  
 作者介绍文中的pointer-generator network是baseline和[pointer network](https://arxiv.org/abs/1506.03134)的一个融合。在每次预测时先计算一个开关变量$p_{gen}$，入参分别有当前根据公式$\ref{3}$计算的上下文向量$h_j^\*$，前一时刻传过来的decoder隐藏状态$s_j$，当前时刻decoder输入token$x_j$。  
 $$p_{gen}=\sigma(w_{h^\*}h_j^\*+w_s s_j+w_x x_j + b_{ptr})\tag{7}\label{7}$$   
-于是产生的词概率分布计算公式$\ref{8}$为：  
+于是产生的词概率分布计算公式由$\ref{4}$升级为$\ref{8}$：  
 $$P(w)=p_{gen}P_{vocab}(w)+(1-p_{gen})\sum_{i:w_i = w}a_i^j\tag{8}\label{8}$$  
 若$w\notin$训练词库，$p_{vocab}$自然为0；  
 若$w\notin$输入文本，$\sum_{i:w_i = w}a_i^j$。  
 > 笔者觉得：这里的$\sum_{i:w_i = w}a_i^j$是在第j次预测时，相同的encoder输入token($w_i$)的attention weight求和。比如输入文本为`我是东南大学的学生，东南大学是一所教学质量过硬的高校。`，这里假设令$w_i$为`东南大学`时，因为该token出现了两次，所以要把两个位置的attentiono weight相加。  
 
-这样一来，预测下一个词的概率分布$p(w)$的w着眼于上文提到的 *extended vocabulary* 。可以避免OOV。
+这样一来，预测下一个词的概率分布$p(w)$的w着眼于上文提到的 *extended vocabulary* ，训练Loss还是公式$\ref{5}$和公式$\ref{6}$，可以通过引导开关变量，进而让模型学会什么时候需要从输入文本复制词，这样可以避免OOV。
 
 
